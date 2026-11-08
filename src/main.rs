@@ -22,7 +22,8 @@ fn get_os() -> String {
 }
 
 fn get_cpu() -> String {
-    if let Ok(sys) = System::new_all() {
+    if let Ok(mut sys) = System::new() {
+        sys.refresh_cpu_all();
         return sys.cpus()[0].brand().to_string().to_lowercase();
     } else {
         return "unknown".to_string();
@@ -30,7 +31,8 @@ fn get_cpu() -> String {
 }
 
 fn get_memory() -> String {
-    if let Ok(sys) = System::new_all() {
+    if let Ok(mut sys) = System::new() {
+        sys.refresh_memory();
         return format!("{} gib", sys.total_memory() / 1024 / 1024 / 1024);
     } else {
         return "unknown".to_string();
@@ -38,7 +40,8 @@ fn get_memory() -> String {
 }
 
 fn get_swap() -> String {
-    if let Ok(sys) = System::new_all() {
+    if let Ok(mut sys) = System::new() {
+        sys.refresh_memory();
         return format!("{} gib", sys.total_swap() / 1024 / 1024 / 1024);
     } else {
         return "unknown".to_string();
@@ -55,6 +58,10 @@ fn get_longest_line_length(text: &str) -> usize {
 // gets padding for a sting
 fn pad(text: &str, length: usize) -> String {
     return format!("{}{}", text, " ".repeat(length - text.len()));
+}
+
+fn print_info(line: &str, line_length: usize, info_title: &str, title_length: usize, info_content:String) {
+    println!("{}  \x1b[1m{}\x1b[22m {}", pad(line, line_length), pad(info_title, title_length), info_content);
 }
 
 fn main() {
@@ -79,7 +86,7 @@ fn main() {
 
         if info_line != None {
             let (info_title, info_content) = info_line.unwrap();
-            println!("{}  \x1b[1m{}\x1b[22m {}", pad(line, max_length), pad(info_title, infotitle_max_len), info_content);
+            print_info(line, max_length, info_title, infotitle_max_len, info_content);
         } else {
             println!("{}", line);
         }
@@ -87,6 +94,6 @@ fn main() {
 
     for line in info_lines_iter {
         let (info_title, info_content) = line;
-        println!("{}  \x1b[1m{}\x1b[22m {}", pad("", max_length), pad(info_title, infotitle_max_len), info_content);
+        print_info("", max_length, info_title, infotitle_max_len, info_content);
     }
 }
