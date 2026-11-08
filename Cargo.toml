@@ -1,0 +1,8 @@
+[package]
+name = "pawfetch"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+os-release = "0.1.0"
+sysinfo = "0.40.1"
