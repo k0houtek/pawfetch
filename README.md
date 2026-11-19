@@ -7,6 +7,7 @@ the code is terrible but it works :p
 currently pawfetch can be configured via 2 environment variables
 - `PAWFETCH_ASCIIART` to set the ASCII art to use
 - `PAWFETCH_INFOLINES` to control what information to display
+
 the format of `PAWFETCH_INFOLINES` is a comma-separated list of `title:content` pairs, where content can be:
     - `os`
     - `cpu`
