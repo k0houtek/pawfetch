@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 os-release = "0.1.0"
 sysinfo = "0.40.1"
+whoami = "2.1.3"

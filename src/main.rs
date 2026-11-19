@@ -1,6 +1,11 @@
-const ASCII_ART: &str = "(\\/)\n\
-                         (^w^)\n\
-                         (()()";
+const DEFAULT_ASCII_ART: &str = "(\\/)\n\
+                                 (^w^)\n\
+                                 (()()";
+
+const DEFAULT_CONFIG: &str = ":userhost,\
+                              os:os,\
+                              cpu:cpu,\
+                              mem:memory,";
 
 use std::path::Path;
 use os_release::OsRelease;
@@ -48,8 +53,25 @@ fn get_swap() -> String {
     }
 }
 
+fn get_user() -> String {
+    if let Ok(username) = whoami::username() {
+        return username
+    } else {
+        return "unknown".to_string()
+    }
+}
+
+
+fn get_hostname() -> String {
+    if let Ok(hostname) = whoami::hostname() {
+        return hostname
+    } else {
+        return "unknown".to_string()
+    }
+}
+
 // self-descriptive
-fn get_longest_line_length(text: &str) -> usize {
+fn get_longest_line_length(text: &String) -> usize {
     let lines = text.split("\n");
     
     return lines.max_by_key(|x| x.len()).unwrap().len();
@@ -60,23 +82,77 @@ fn pad(text: &str, length: usize) -> String {
     return format!("{}{}", text, " ".repeat(length - text.len()));
 }
 
-fn print_info(line: &str, line_length: usize, info_title: &str, title_length: usize, info_content:String) {
-    println!("{}  \x1b[1m{}\x1b[22m {}", pad(line, line_length), pad(info_title, title_length), info_content);
+fn print_info(line: &str, line_length: usize, info_title: String, title_length: usize, info_content:String) {
+    if info_title.is_empty() {
+        println!("{}  \x1b[1m{}\x1b[22m", pad(line, line_length), info_content);
+    } else {
+        println!("{}  \x1b[1m{}\x1b[22m {}", pad(line, line_length), pad(&info_title, title_length), info_content);
+    }
+}
+
+fn get_ascii_art() -> String {
+    // use content of env var PAWFETCH_ASCIIART if it exists
+    if let Ok(env_ascii_art) = std::env::var("PAWFETCH_ASCIIART") {
+        return env_ascii_art;
+    }
+    
+    // if all else fails, use default ascii art
+    return DEFAULT_ASCII_ART.to_string();
+}
+
+fn get_info_lines() -> Option<Vec<(String, String)>> {
+    let mut info_lines: Vec<(String, String)> = Vec::new();
+    
+    let mut info_lines_string: String = DEFAULT_CONFIG.to_string();
+
+    if let Ok(env_result) = std::env::var("PAWFETCH_INFOLINES") {
+        if !env_result.is_empty() && env_result.contains(":") {
+            info_lines_string = env_result.to_string();
+        }
+    }
+
+    let split = info_lines_string.split(",");
+        
+    for line in split {
+        line.trim()
+            .split_once(":")
+            .map(|(title, content)|
+                info_lines.push(
+                    (title.to_string(), content.to_string())
+                )
+            );
+    }
+
+    return Some(info_lines);
+}
+
+fn get_info(info_string: String) -> String {
+    match info_string.as_str() {
+        "os"        => get_os(),
+        "cpu"       => get_cpu(),
+        "memory"    => get_memory(),
+        "swap"      => get_swap(),
+        "user"      => get_user(),
+        "hostname"  => get_hostname(),
+        "userhost"  => format!("{}@{}",get_user(),get_hostname()),
+        ""          => "".to_string(),
+        _           => "unknown".to_string(),
+    }
 }
 
 fn main() {
-    // ("title", info_function)
-    let info_lines = [
-        ("os", get_os()),
-        ("cpu", get_cpu()),
-        ("mem", get_memory()),
-        ("swp", get_swap())
-    ];
+    let info_lines: Vec<(String, String)>;
+    match get_info_lines() {
+        Some(lines) => info_lines = lines,
+        None => info_lines = Vec::new(),
+    }
+
+    let ascii_art = get_ascii_art();
 
     // gets the longest line in the ascii art
-    let max_length = get_longest_line_length(ASCII_ART);
+    let max_length = get_longest_line_length(&ascii_art);
     
-    let ascii_lines = ASCII_ART.split("\n");
+    let ascii_lines = ascii_art.split("\n");
 
     let infotitle_max_len = info_lines.clone().into_iter().max_by_key(|x| x.0.len()).unwrap().0.len();
     let mut info_lines_iter = info_lines.into_iter();
@@ -86,7 +162,7 @@ fn main() {
 
         if info_line != None {
             let (info_title, info_content) = info_line.unwrap();
-            print_info(line, max_length, info_title, infotitle_max_len, info_content);
+            print_info(line, max_length, info_title, infotitle_max_len, get_info(info_content));
         } else {
             println!("{}", line);
         }
@@ -94,6 +170,6 @@ fn main() {
 
     for line in info_lines_iter {
         let (info_title, info_content) = line;
-        print_info("", max_length, info_title, infotitle_max_len, info_content);
+        print_info("", max_length, info_title, infotitle_max_len, get_info(info_content));
     }
 }
