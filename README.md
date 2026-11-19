@@ -9,13 +9,13 @@ currently pawfetch can be configured via 2 environment variables
 - `PAWFETCH_INFOLINES` to control what information to display
 
 the format of `PAWFETCH_INFOLINES` is a comma-separated list of `title:content` pairs, where content can be:
-    - `os`
-    - `cpu`
-    - `memory`
-    - `swap`
-    - `user`
-    - `hostname`
-    - `userhost`
-    - blank for an empty line
+- `os`
+- `cpu`
+- `memory`
+- `swap`
+- `user`
+- `hostname`
+- `userhost`
+- blank for an empty line
 
 and title can be any string (leave blank to make the content line show up on its own, in bold)
