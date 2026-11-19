@@ -16,4 +16,5 @@ the format of `PAWFETCH_INFOLINES` is a comma-separated list of `title:content` 
     - `hostname`
     - `userhost`
     - blank for an empty line
+
 and title can be any string (leave blank to make the content line show up on its own, in bold)
