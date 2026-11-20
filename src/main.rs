@@ -8,6 +8,7 @@ const DEFAULT_CONFIG: &str = ":userhost,\
                               mem:memory,";
 
 use std::path::Path;
+use std::fs;
 use os_release::OsRelease;
 use sysinfo::System;
 
@@ -96,6 +97,13 @@ fn get_ascii_art() -> String {
         return env_ascii_art;
     }
     
+    if let Some(mut path) = std::env::home_dir() {
+        path.push(".config/pawfetch/ascii_art");
+        if path.exists() && let Ok(config_ascii_art) = fs::read_to_string(path) {
+            return config_ascii_art;
+        }
+    }
+    
     // if all else fails, use default ascii art
     return DEFAULT_ASCII_ART.to_string();
 }
@@ -104,6 +112,15 @@ fn get_info_lines() -> Option<Vec<(String, String)>> {
     let mut info_lines: Vec<(String, String)> = Vec::new();
     
     let mut info_lines_string: String = DEFAULT_CONFIG.to_string();
+    
+    if let Some(mut path) = std::env::home_dir() {
+        path.push(".config/pawfetch/infolines");
+        if path.exists() && let Ok(config_result) = fs::read_to_string(path) {
+            if !config_result.is_empty() && config_result.contains(":") {
+                info_lines_string = config_result;
+            }
+        }
+    }
 
     if let Ok(env_result) = std::env::var("PAWFETCH_INFOLINES") {
         if !env_result.is_empty() && env_result.contains(":") {

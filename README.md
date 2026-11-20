@@ -4,11 +4,15 @@ complete rust noob's attempt at making a fetch script as practice
 the code is terrible but it works :p
 
 ## configuration!
-currently pawfetch can be configured via 2 environment variables
-- `PAWFETCH_ASCIIART` to set the ASCII art to use
-- `PAWFETCH_INFOLINES` to control what information to display
+pawfetch can be configured via either these config files:
+- `~/.config/pawfetch/ascii_art` for the ASCII art
+- `~/.config/pawfetch/infolines` for the infolines, which control the info to display
 
-the format of `PAWFETCH_INFOLINES` is a comma-separated list of `title:content` pairs, where content can be:
+or these environment variables
+- `PAWFETCH_ASCIIART`
+- `PAWFETCH_INFOLINES`
+
+the format of the infolines config is a comma-separated list of `title:content` pairs, where content can be:
 - `os`
 - `cpu`
 - `memory`
