@@ -74,18 +74,18 @@ fn get_hostname() -> String {
 fn get_uptime() -> String {
     if let Ok(uptime) = System::uptime() {
         if uptime / 3600 / 24 > 0 {
-            return format!("{} days", uptime / 3600 /24);
+            return format!("{} days, {} hrs", uptime / 3600 /24, uptime / 3600 % 24);
         }
 
         if uptime / 3600 > 0 {
-            return format!("{} hours", uptime / 3600);
+            return format!("{} hrs, {} mins", uptime / 3600, uptime / 60 % 60);
         }
         
         if uptime / 60 > 0 {
-            return format!("{} minutes", uptime / 60);
+            return format!("{} mins, {} secs", uptime / 60, uptime % 60);
         }
 
-        return format!("{} seconds", uptime);
+        return format!("{} secs", uptime);
     } else {
         return "unknown".to_string();
     }
