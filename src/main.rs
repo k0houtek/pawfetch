@@ -71,6 +71,26 @@ fn get_hostname() -> String {
     }
 }
 
+fn get_uptime() -> String {
+    if let Ok(uptime) = System::uptime() {
+        if uptime / 3600 / 24 > 0 {
+            return format!("{} days", uptime / 3600 /24);
+        }
+
+        if uptime / 3600 > 0 {
+            return format!("{} hours", uptime / 3600);
+        }
+        
+        if uptime / 60 > 0 {
+            return format!("{} minutes", uptime / 60);
+        }
+
+        return format!("{} seconds", uptime);
+    } else {
+        return "unknown".to_string();
+    }
+}
+
 // self-descriptive
 fn get_longest_line_length(text: &String) -> usize {
     let lines = text.split("\n");
@@ -152,6 +172,7 @@ fn get_info(info_string: String) -> String {
         "user"      => get_user(),
         "hostname"  => get_hostname(),
         "userhost"  => format!("{}@{}",get_user(),get_hostname()),
+        "uptime"    => get_uptime(),
         ""          => "".to_string(),
         _           => "unknown".to_string(),
     }
